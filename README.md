@@ -122,4 +122,12 @@ An Example Task:
 
 13 points total out of 10 required points 
 
+### Libraries/Packages to Use
+* React (Frontend Framework)
+* Socket.io (Real-time Communication)
+* Tailwind CSS (Styling)
+* react-beautiful-dnd (Drag and Drop)
+* ESLint (Code Quality)
+* Vite (Build Tool)
+
 ## [Link to Initial Main Project File](app.mjs)
