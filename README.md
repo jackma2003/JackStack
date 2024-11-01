@@ -64,3 +64,20 @@ An Example Task:
   updatedAt: // timestamp
 }
 ```
+
+## [Link to Commented First Draft Schema](db.mjs)
+
+## WireFrames 
+
+/login - User authentication page 
+![Login Page](documentation/login.png)
+
+/dashboard - Main dashboard showing all projects 
+![Dashboard](documentation/dashboard.png)
+
+/project/:id - Project board with Kanban view
+![Project Board](documentation/project.png) 
+
+/project/:id/settings - Project settings page
+![Project Setting](documentation/project:setting.png)
+
