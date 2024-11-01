@@ -81,3 +81,45 @@ An Example Task:
 /project/:id/settings - Project settings page
 ![Project Setting](documentation/project:setting.png)
 
+## Site Map 
+![Site Map](documentation/site_map.png)
+
+## User Stories or Use Cases 
+1. As a new user, I can register for an account with my email and password 
+2. As a registered user, I can log in to access my projects
+3. As an user, I can create new projects and invite team members to contribute to these projects 
+4. As an user, I can create tasks within a project 
+5. As an user, I can assign tasks to team members 
+6. As an user, I can drag and drop tasks between different status columns 
+7. As an user, I can comment on tasks 
+8. As an user, I can receive real-time updates when tasks are modified 
+9. As an user, I can set due dates and priorities for tasks 
+10. As an project owner, I can manage project settings and member access 
+
+## Research Topics 
+* (6 points) React with Hooks and Context API 
+    * Using React as the frontend framework 
+    * Implementation of complex state management using Context API 
+    * Real-time updates and component lifecycle management using Hooks 
+    * Building reusable components for task management 
+    * Will require deployment considerations for frontend/backend separation 
+
+* (3 points) Socket.io Integration 
+    * Implementing real-time updates for task changes
+    * Enabling live collaboration features 
+
+* (2 points) Tailwind CSS Framework 
+    * Using Tailwind for customized UI components 
+    * Creating a custom theme to match project branding 
+    * Implementing responsive design patterns 
+    * Will show custom configuration in tailwind.config.js 
+
+* (2 points) ESLint with Vite 
+    * Implement ESLint for code quality and consistency 
+    * Custom ESLint configuration for React/Node.js 
+    * Integration with Vite build process 
+    * Will demonstrate automatic linting on file changes 
+
+13 points total out of 10 required points 
+
+## [Link to Initial Main Project File](app.mjs)
