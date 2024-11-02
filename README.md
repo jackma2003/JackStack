@@ -94,7 +94,7 @@ An Example Task:
 7. As an user, I can comment on tasks 
 8. As an user, I can receive real-time updates when tasks are modified 
 9. As an user, I can set due dates and priorities for tasks 
-10. As an project owner, I can manage project settings and member access 
+10. As a project owner, I can manage project settings and member access 
 
 ## Research Topics 
 * (6 points) React with Hooks and Context API 
@@ -126,7 +126,7 @@ An Example Task:
 * React (Frontend Framework)
 * Socket.io (Real-time Communication)
 * Tailwind CSS (Styling)
-* react-beautiful-dnd (Drag and Drop)
+* react-dnd (Drag and Drop)
 * ESLint (Code Quality)
 * Vite (Build Tool)
 
