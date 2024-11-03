@@ -1,5 +1,6 @@
 {
   "name": "jackstack",
+  "type": "module",
   "version": "1.0.0",
   "description": "A modern project management tool built with MERN stack",
   "main": "index.js",
