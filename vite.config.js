@@ -1,4 +1,3 @@
-// node doesn't support react so we use Vite
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath } from 'url'
@@ -15,7 +14,12 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
-    open: true,
+    port: 5173, // Frontend port
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000', // Backend port
+        changeOrigin: true,
+      }
+    }
   }
 })

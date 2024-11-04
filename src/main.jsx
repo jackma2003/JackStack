@@ -1,13 +1,23 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import TaskForm from './create_task'
 import './input.css'
 import LoginPage from './login'
+import RegisterPage from './register'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <div className="min-h-screen bg-gray-100 py-8">
-      <LoginPage/>
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-100 py-8">
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/create-task" element={<TaskForm />} />
+          <Route path="/dashboard" element={<Dashboard/>} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   </React.StrictMode>
 )

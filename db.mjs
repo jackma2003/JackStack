@@ -1,22 +1,22 @@
 // 1ST DRAFT DATA MODEL
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 // User schema
 // * users require authentication 
 // * users can have 0 or more projects 
 // * users can be assigned to multiple projects 
-const User = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     username: {type: String, required: true, unique: true},
     email: {type: String, required: true, unique: true},
+    hash: {type: String, required: true}, 
     avatar: {type: String},
-    // password hash will be handled by authentication plugin
     projects: [{type: mongoose.Schema.Types.ObjectId, ref: "Project"}],
     createdAt: {type: Date, default: Date.now},
     updatedAt: {type: Date, default: Date.now}
 });
 
 // Comment Schema (embedded in Task)
-const Comment = new mongoose.Schema({
+const CommentSchema = new mongoose.Schema({
     user: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
     content: {type: String, required: true},
     createdAt: {type: Date, default: Date.now}
@@ -28,7 +28,7 @@ const Comment = new mongoose.Schema({
 // * each task must belong to a project 
 // * tasks can be assigned to one user 
 // * tasks can have multiple comments 
-const Task = new mongoose.Schema({
+const TaskSchema = new mongoose.Schema({
     project: {type: mongoose.Schema.Types.ObjectId, ref: "Project", required: true},
     title: {type: String, required: true},
     description: {type: String},
@@ -49,7 +49,7 @@ const Task = new mongoose.Schema({
     dueDate: {type: Date},
     position: {type: Number, required: true}, // for ordering in kanban columns
     labels: [{types: String}],
-    comments: [Comment],
+    comments: [CommentSchema],
     createdAt: {type: Date, default: Date.now},
     updatedAt: {type: Date, default: Date.now}
 });
@@ -58,7 +58,7 @@ const Task = new mongoose.Schema({
 // * each project must have an owner (user)
 // * project can have multiple team members 
 // * projects can have multiple tasks 
-const Project = new mongoose.Schema({
+const ProjectSchema = new mongoose.Schema({
     name: {type: String, require: true},
     description: {type: String},
     owner: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
@@ -73,9 +73,25 @@ const Project = new mongoose.Schema({
     updatedAt: {type: Date, default: Date.now}
 });
 
-// Register models 
-mongoose.model("User", User);
-mongoose.model("Task", Task);
-mongoose.model("Project", Project);
+// Create and export models
+const User = mongoose.model('User', UserSchema);
+const Task = mongoose.model('Task', TaskSchema);
+const Project = mongoose.model('Project', ProjectSchema);
 
-// TODO: Add configuration for MongoDB connection...etc
+export { User, Task, Project };
+
+// Connect to MongoDB
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/jackstack', {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        console.log('MongoDB connected successfully');
+    } catch (err) {
+        console.error('MongoDB connection error:', err);
+        process.exit(1);
+    }
+};
+
+export default connectDB;

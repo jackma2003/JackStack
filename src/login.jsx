@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
@@ -8,13 +9,41 @@ const LoginPage = () => {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        // TODO: implement login
-        console.log('Login attempted with:', formData);
-        setIsLoading(false);
+        setError("");
+
+        try {
+            const response = await fetch("/api/users/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Something went wrong");
+            }
+
+            // Store token in local Storage 
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
+
+            // Redirect to dashboard
+            navigate("/dashboard");
+        }
+        catch (err) {
+            setError(err.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
     };
 
     const handleChange = (e) => {
@@ -147,12 +176,12 @@ const LoginPage = () => {
                     </div>
                     
                     <div className="mt-6">
-                        <a 
-                        href="/register"
+                        <Link 
+                        to="/register"
                         className="flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                         >
                             Create an account
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>
