@@ -43,7 +43,7 @@ app.use((err, req, res, next) => {
 });
 
 // Serve React files in the src directory 
-app.use(express.static(path.join(__dirname, 'src')));
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // Send the React app for all other routes
 app.get('*', (req, res) => {
