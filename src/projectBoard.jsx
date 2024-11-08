@@ -3,6 +3,7 @@ import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useParams, useNavigate } from "react-router-dom";
 import { PlusCircle, Clock, User, Tag } from "lucide-react";
+import "./input.css";
 
 // Task card component 
 const TaskCard = ({ task, index, moveTask, status }) => {
