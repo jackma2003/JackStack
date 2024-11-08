@@ -6,6 +6,7 @@ import './input.css'
 import LoginPage from './login'
 import RegisterPage from './register'
 import Dashboard from "./dashboard"
+import ResetPassword from './resetPassword';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/dashboard" element={<Dashboard/>} />
           <Route path="/create-task" element={<TaskForm />} />
+          <Route path="/reset-password/:token" element={<ResetPassword/>}/>
         </Routes>
       </div>
     </BrowserRouter>

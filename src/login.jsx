@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import "./input.css";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -11,6 +12,19 @@ const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
+    const [rememberMe, setRememberMe] = useState(false);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
+    const [resetEmail, setResetEmail] = useState("");
+    const [resetStatus, setResetStatus] = useState("");
+
+    // Check for rememberMe on mount 
+    useEffect(() => {
+        const rememberedEmail = localStorage.getItem("rememberedEmail");
+        if (rememberedEmail) {
+            setFormData(prev => ({ ...prev, email: rememberedEmail }));
+            setRememberMe(true);
+        }
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,13 +37,21 @@ const LoginPage = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(formData, rememberMe),
             });
 
             const data = await response.json();
 
             if (!response.ok) {
                 throw new Error(data.message || "Something went wrong");
+            }
+
+            // Handle remember me 
+            if (rememberMe) {
+                localStorage.setItem("rememberedEmail", formData.email);
+            }
+            else {
+                localStorage.removeItem("rememberedEmail");
             }
 
             // Store token in local Storage 
@@ -41,6 +63,41 @@ const LoginPage = () => {
         }
         catch (err) {
             setError(err.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleForgotPassword = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setResetStatus("");
+
+        try {
+            const response = await fetch("/api/users/forgot-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email: resetEmail }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message);
+            }
+
+            setResetStatus("Password reset instructions have been sent to your email.");
+            setResetEmail("");
+            setTimeout(() => {
+                setShowForgotPassword(false);
+                setResetStatus("");
+            }, 3000);
+        }
+        catch (err) {
+            setResetStatus(err.message);
         }
         finally {
             setIsLoading(false);
@@ -68,10 +125,55 @@ const LoginPage = () => {
                 </p>
             </div>
 
-            {/* Email Address */}
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+                {/* Reset Password */}
                 <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+                    {error && (
+                        <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded-md">
+                            {error}    
+                        </div>
+                    )}
+
+                    {resetStatus && (
+                        <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-600 rounded-md">
+                            {resetStatus}
+                        </div>
+                    )}
+
+                    {showForgotPassword ? (
+                        <form onSubmit={handleForgotPassword} className="space-y-6">
+                            <div>
+                                <label htmlFor="resetEmail" className="block text-sm font-medium text-gray-700">
+                                    Email address
+                                </label>
+                                <input 
+                                    type="email"
+                                    id="resetEmail"
+                                    value={resetEmail}
+                                    onChange={(e) => setResetEmail(e.target.value)}
+                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                                    required
+                                    disabled={isLoading}
+                                />
+                            </div>
+                            <div className="flex justify-between">
+                                <button 
+                                    type="button"
+                                    onClick={() => setShowForgotPassword(false)}
+                                    className="text-blue-600 hover:text-blue-500">
+                                        Back to Login
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                                        {isLoading ? "Sending..." : "Send Reset Instructions"}
+                                    </button>
+                            </div>
+                        </form>
+                    ) : (
                     <form className="space-y-6" onSubmit={handleSubmit}>
+                        {/* Email Address */}
                         <div>
                             <label
                                 htmlFor="email"
@@ -132,6 +234,8 @@ const LoginPage = () => {
                                         id="remember-me"
                                         name="remember=me"
                                         type="checkbox"
+                                        checked={rememberMe}
+                                        onChange={(e) => setRememberMe(e.target.checked)}
                                         className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                     />
                                     <label
@@ -143,12 +247,13 @@ const LoginPage = () => {
                                 </div>
 
                                 <div className="text-sm">
-                                    <a 
-                                    href="#"
+                                    <button
+                                    type="button"
+                                    onClick={() => setShowForgotPassword(true)}
                                     className="font-medium text-blue-600 hover:text-blue-500"
                                     >
                                         Forgot your password?
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
 
@@ -162,7 +267,7 @@ const LoginPage = () => {
                                 </button>
                             </div>                        
                     </form>
-                    
+                    )}
                     {/* Create new account*/}
                     <div className="mt-6">
                         <div className="relative">

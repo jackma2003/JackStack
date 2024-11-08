@@ -14,7 +14,9 @@ const UserSchema = new mongoose.Schema({
     avatar: {type: String},
     projects: [{type: mongoose.Schema.Types.ObjectId, ref: "Project"}],
     createdAt: {type: Date, default: Date.now},
-    updatedAt: {type: Date, default: Date.now}
+    updatedAt: {type: Date, default: Date.now},
+    resetPasswordToken: String, 
+    resetPasswordExpires: Date
 });
 
 // Comment Schema (embedded in Task)

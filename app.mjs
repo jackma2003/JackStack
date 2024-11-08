@@ -25,13 +25,22 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve React files in the src directory 
-app.use(express.static(path.join(__dirname, 'src')));
-
 // API routes 
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
+
+// Serve React files in the src directory 
+app.use(express.static(path.join(__dirname, 'src')));
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        message: 'Something broke!',
+        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+});
 
 // Send the React app for all other routes
 app.get('*', (req, res) => {
@@ -50,16 +59,6 @@ try {
     process.exit(1);
 };
 
-connectDB();
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        message: 'Something broke!',
-        error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    });
-});
 
 // Start server
 const PORT = process.env.PORT || 3000;
