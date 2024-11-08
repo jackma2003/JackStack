@@ -14,10 +14,10 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173, // Frontend port
+    port: 29366, // Frontend port
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', // Backend port
+        target: 'http://localhost:29366', // Backend port
         changeOrigin: true,
       }
     }
