@@ -17,7 +17,7 @@ export default defineConfig({
     port: 29366, // Frontend port
     proxy: {
       '/api': {
-        target: 'http://localhost:29366', // Backend port
+        target: 'http://linserv1.cims.nyu.edu:29366', // Backend port
         changeOrigin: true,
       }
     }
