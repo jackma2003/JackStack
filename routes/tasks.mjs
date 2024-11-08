@@ -53,7 +53,7 @@ router.get("/project/:projectId", authenticateToken, async (req, res) => {
 router.post('/create', authenticateToken, async (req, res) => {
     try {
         // Verify user has access to this project
-        const project = await Project.findById(req.params.projectId);
+        const project = await Project.findById(req.body.projectId);
         if (!project) {
             return res.status(404).json({ message: "Project not found" });
         }
@@ -65,12 +65,12 @@ router.post('/create', authenticateToken, async (req, res) => {
 
         // Get max position for the status
         const maxPositionTask = await Task.findOne({ 
-            project: req.params.projectId, 
+            project: req.body.projectId, 
             status: req.body.status || 'todo' 
         }).sort({ position: -1 });
 
         const task = new Task({
-            project: req.params.projectId,
+            project: req.body.projectId,
             title: req.body.title,
             description: req.body.description,
             status: req.body.status || 'todo',
