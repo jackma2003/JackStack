@@ -241,8 +241,17 @@ const Dashboard = () => {
                             </div>
                         </div>
                         <button
-                            onClick={() => navigate(`/project/${project._id}`)}
-                            className="mt-4 w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
+                            onClick={() => {
+                                console.log("Project ID:", project._id);
+                                if (!project._id) {
+                                    console.error("Missing project ID");
+                                    return;
+                                }
+                                console.log("Navigating to:", `/project/${project._id}`);
+                                navigate(`/project/${project._id}`);
+                            }}
+                            className="mt-4 w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors duration-200"
+                        >
                             View Project
                         </button>
                         </div>

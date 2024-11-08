@@ -83,6 +83,22 @@ const Column = ({ status, tasks, moveTask }) => {
 const ProjectBoard = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        console.log("ProjectBoard mounted");
+        console.log("Project ID from params:", id);
+        console.log("Current token:", localStorage.getItem("token"));
+        
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.log("No token found, redirecting to login");
+            navigate("/login");
+            return;
+        }
+        
+        fetchData();
+    }, [id, navigate]);
+
     const [project, setProject] = useState(null);
     const [tasks, setTasks] = useState([]);
     const [showNewTask, setShowNewTask] = useState(false);
