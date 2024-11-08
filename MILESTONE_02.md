@@ -24,8 +24,12 @@ disclaimer: first npm run build and then node app.mjs for it to work properly
 
 URL for form 
 ---
-API Endpoints for the login/registration page (password reset still work in progress)
+API Endpoints and frontend for the login/registration page (password reset still work in progress)
 https://github.com/nyu-csci-ua-0467-001-002-fall-2024/final-project-jackma2003/blob/master/routes/user.mjs
+
+https://github.com/nyu-csci-ua-0467-001-002-fall-2024/final-project-jackma2003/blob/master/src/login.jsx
+
+https://github.com/nyu-csci-ua-0467-001-002-fall-2024/final-project-jackma2003/blob/master/src/register.jsx
 
 URL for form result
 ---
@@ -35,5 +39,7 @@ URL to github that shows line of code where research topic(s) are used / impleme
 --- 
 Research Topics: React, Tailwind, JWT authentication
 https://github.com/nyu-csci-ua-0467-001-002-fall-2024/final-project-jackma2003/blob/master/src/login.jsx
+
+https://github.com/nyu-csci-ua-0467-001-002-fall-2024/final-project-jackma2003/blob/master/src/register.jsx
 
 https://github.com/nyu-csci-ua-0467-001-002-fall-2024/final-project-jackma2003/blob/master/routes/user.mjs
