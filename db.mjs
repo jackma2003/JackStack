@@ -1,5 +1,7 @@
-// 1ST DRAFT DATA MODEL
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // User schema
 // * users require authentication 
@@ -48,7 +50,7 @@ const TaskSchema = new mongoose.Schema({
     creator: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
     dueDate: {type: Date},
     position: {type: Number, required: true}, // for ordering in kanban columns
-    labels: [{types: String}],
+    labels: [{type: String}],
     comments: [CommentSchema],
     createdAt: {type: Date, default: Date.now},
     updatedAt: {type: Date, default: Date.now}
@@ -59,7 +61,7 @@ const TaskSchema = new mongoose.Schema({
 // * project can have multiple team members 
 // * projects can have multiple tasks 
 const ProjectSchema = new mongoose.Schema({
-    name: {type: String, require: true},
+    name: {type: String, required: true},
     description: {type: String},
     owner: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
     members: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
@@ -73,23 +75,34 @@ const ProjectSchema = new mongoose.Schema({
     updatedAt: {type: Date, default: Date.now}
 });
 
-// Create and export models
-const User = mongoose.model('User', UserSchema);
-const Task = mongoose.model('Task', TaskSchema);
-const Project = mongoose.model('Project', ProjectSchema);
+// Middleware for timestamp updates 
+UserSchema.pre("save", function(next) {
+    this.UpdatedAt = Date.now();
+    next();
+})
 
-export { User, Task, Project };
+ProjectSchema.pre('save', function(next) {
+    this.updatedAt = Date.now();
+    next();
+});
+
+TaskSchema.pre('save', function(next) {
+    this.updatedAt = Date.now();
+    next();
+});
+
+// Create and export models
+export const User = mongoose.model('User', UserSchema);
+export const Task = mongoose.model('Task', TaskSchema);
+export const Project = mongoose.model('Project', ProjectSchema);
 
 // Connect to MongoDB
-const connectDB = async () => {
+export const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/jackstack', {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
-        console.log('MongoDB connected successfully');
-    } catch (err) {
-        console.error('MongoDB connection error:', err);
+        const conn = await mongoose.connect(process.env.MONGODB_URI);
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
         process.exit(1);
     }
 };

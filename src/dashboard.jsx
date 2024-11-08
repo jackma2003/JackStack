@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { PlusCircle, Settings, LogOut, ChevronDown, Clock, AlertCircle } from "lucide-react";
+import { PlusCircle, Settings, LogOut, ChevronDown, Clock, AlertCircle, Edit, Trash2 } from "lucide-react";
 import "./input.css"
 
 const Dashboard = () => {
@@ -10,10 +10,25 @@ const Dashboard = () => {
     const [error, setError] = useState("");
     const [user, setUser] = useState(null);
     const [showCreateProject, setShowCreateProject] = useState(false);
+    const [isCreatingProject, setIsCreatingProject] = useState(false);
+    const [createProjectError, setCreateProjectError] = useState("");
+    const [activeSettingsMenu, setActiveSettingsMenu] = useState(null);
     const [newProject, setNewProject] = useState({
         name: "",
         description: ""
-    })
+    });
+
+    // Close settings menu when user clicks outside 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (activeSettingsMenu && !event.target.closest(".settings-menu")) {
+                setActiveSettingsMenu(null);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [activeSettingsMenu]);
 
     // Fetch user data and projects on component mount 
     useEffect(() => {
@@ -31,7 +46,7 @@ const Dashboard = () => {
 
     const fetchProjects = async () => {
         try {
-            const response = await fetch("/api/projects", {
+            const response = await fetch("/api/projects/dashboard", {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 }
@@ -54,8 +69,11 @@ const Dashboard = () => {
 
     const handleCreateProject = async (e) => {
         e.preventDefault();
+        setIsCreatingProject(true);
+        setCreateProjectError("");
+
         try {
-            const response = await fetch("/api/projects", {
+            const response = await fetch("/api/projects/dashboard", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -63,22 +81,52 @@ const Dashboard = () => {
                 },
                 body: JSON.stringify({
                     name: newProject.name,
-                    description: newProject.description,
-                    owner: user.id
+                    description: newProject.description
                 })
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                throw new Error("Failed to create project");
+                throw new Error(data.message || "Failed to create project");
             }
 
-            const data = await response.json();
+            // Add new project to state 
             setProjects(prev => [...prev, data]);
             setShowCreateProject(false);
             setNewProject({ name: "", description: "" });
+
+            // Refetch all projects to ensure data is fresh 
+            fetchProjects();
         }
         catch (err) {
-            setError(err.message);
+            setCreateProjectError(err.message);
+        }
+        finally {
+            setIsCreatingProject(false);
+        }
+    };
+
+    const handleDeleteProject = async (projectId) => {
+        if (window.confirm("Are you sure you want to delete this project?")) {
+            try {
+                const response = await fetch(`/api/projects/${projectId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to delete project");
+                }
+
+                setProjects(projects.filter(project => project._id !== projectId));
+                setActiveSettingsMenu(null);
+            }
+            catch (err) {
+                setError(err.message);
+            }
         }
     };
 
@@ -149,16 +197,38 @@ const Dashboard = () => {
                         <div className="p-6">
                         <div className="flex justify-between items-start">
                             <div>
-                            <h3 className="text-lg font-medium text-gray-900">
-                                {project.name}
-                            </h3>
-                            <p className="mt-1 text-sm text-gray-500">
-                                {project.description}
-                            </p>
+                                <h3 className="text-lg font-medium text-gray-900">
+                                    {project.name}
+                                </h3>
+                                <p className="mt-1 text-sm text-gray-500">
+                                    {project.description}
+                                </p>
                             </div>
-                            <button className="text-gray-400 hover:text-gray-500">
-                            <Settings className="h-5 w-5"/>
-                            </button>
+                            <div className="relative settings-menu">
+                                <button 
+                                    onClick={() => setActiveSettingsMenu(activeSettingsMenu === project._id ? null : project._id)}
+                                    className="text-gray-400 hover:text-gray-500">
+                                    <Settings className="h-5 w-5"/>
+                                </button>
+                                {activeSettingsMenu === project._id && (
+                                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                                        <div className="py-1">
+                                            <button
+                                                onClick={() => navigate(`/project/${project._id}/edit`)}
+                                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full">
+                                                <Edit className="h-4 w-4 mr-2"/>
+                                                Edit Project
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteProject(project._id)}
+                                                className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full">
+                                                <Trash2 className="h-4 w-4 mr-2"/>
+                                                Delete Project
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div className="mt-4 flex items-center justify-between">
                             <div className="flex items-center text-sm text-gray-500">
@@ -185,54 +255,63 @@ const Dashboard = () => {
                 {showCreateProject && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-                    <div className="p-6">
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">Create New Project</h3>
-                        <form onSubmit={handleCreateProject}>
-                        <div className="space-y-4">
-                            <div>
-                            <label htmlFor="projectName" className="block text-sm font-medium text-gray-700">
-                                Project Name
-                            </label>
-                            <input
-                                type="text"
-                                id="projectName"
-                                value={newProject.name}
-                                onChange={(e) => setNewProject(prev => ({ ...prev, name: e.target.value }))}
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                                required/>
-                            </div>
-                            <div>
-                            <label htmlFor="projectDescription" className="block text-sm font-medium text-gray-700">
-                                Description
-                            </label>
-                            <textarea
-                                id="projectDescription"
-                                value={newProject.description}
-                                onChange={(e) => setNewProject(prev => ({ ...prev, description: e.target.value }))}
-                                rows={3}
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-blue-500"/>
-                            </div>
+                        <div className="p-6">
+                            <h3 className="text-lg font-medium text-gray-900 mb-4">Create New Project</h3>
+                            {createProjectError && (
+                                <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+                                    {createProjectError}
+                                </div>
+                            )}
+                            <form onSubmit={handleCreateProject}>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label htmlFor="projectName" className="block text-sm font-medium text-gray-700">
+                                            Project Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="projectName"
+                                            value={newProject.name}
+                                            onChange={(e) => setNewProject(prev => ({ ...prev, name: e.target.value }))}
+                                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                                            required
+                                            disabled={isCreatingProject}/>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="projectDescription" className="block text-sm font-medium text-gray-700">
+                                            Description
+                                        </label>
+                                        <textarea
+                                            id="projectDescription"
+                                            value={newProject.description}
+                                            onChange={(e) => setNewProject(prev => ({ ...prev, description: e.target.value }))}
+                                            rows={3}
+                                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                                            disabled={isCreatingProject}/>
+                                    </div>
+                                </div>
+                                <div className="mt-6 flex justify-end space-x-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCreateProject(false)}
+                                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                                        disabled={isCreatingProject}>
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                                        disabled={isCreatingProject}>
+                                        {isCreatingProject ? 'Creating...' : 'Create Project'}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <div className="mt-6 flex justify-end space-x-3">
-                            <button
-                            type="button"
-                            onClick={() => setShowCreateProject(false)}
-                            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
-                            Cancel
-                            </button>
-                            <button
-                            type="submit"
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            Create Project
-                            </button>
-                        </div>
-                        </form>
-                    </div>
                     </div>
                 </div>
                 )}
             </main>
-            </div>
+        </div>
         );
 };
 

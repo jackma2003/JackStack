@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { connectDB } from "./db.mjs";
 
 // Load .env variables
 dotenv.config();
@@ -43,11 +44,13 @@ try {
         useNewUrlParser: true,
         useUnifiedTopology: true
     });
-    console.log('Connected to MongoDB');
+    console.log('Connected to MongoDB Atlas');
 } catch (err) {
     console.error('MongoDB connection error:', err);
     process.exit(1);
-}
+};
+
+connectDB();
 
 // Error handling middleware
 app.use((err, req, res, next) => {
