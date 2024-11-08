@@ -224,14 +224,77 @@ const ProjectBoard = () => {
 
                     {/* New Task Modal */}
                     {showNewTask && (
-                        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
+                        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
                             <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
                                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                                     Create New Task
                                 </h3>
                                 <form onSubmit={handleCreateTask}>
-                                    {/* Form fields remain the same */}
-                                    {/* ... */}
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">
+                                                Title
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={newTask.title}
+                                                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">
+                                                Description
+                                            </label>
+                                            <textarea
+                                                value={newTask.description}
+                                                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                                                rows={3}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">
+                                                Priority
+                                            </label>
+                                            <select
+                                                value={newTask.priority}
+                                                onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+                                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                                            >
+                                                <option value="low">Low</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="high">High</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">
+                                                Due Date
+                                            </label>
+                                            <input
+                                                type="date"
+                                                value={newTask.dueDate}
+                                                onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+                                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="mt-6 flex justify-end space-x-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowNewTask(false)}
+                                            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                        >
+                                            Create Task
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
