@@ -97,9 +97,9 @@ An Example Task:
 10. As a project owner, I can manage project settings and member access 
 
 ## Research Topics 
-* (6 points) React with Hooks and Context API 
+* (6 points) React with Hooks and React-dnd 
     * Using React as the frontend framework 
-    * Implementation of complex state management using Context API 
+    * Drag and Drop feature for projects/task's with react-dnd 
     * Real-time updates and component lifecycle management using Hooks 
     * Building reusable components for task management 
     * Will require deployment considerations for frontend/backend separation 
