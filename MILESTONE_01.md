@@ -7,7 +7,13 @@ https://github.com/nyu-csci-ua-0467-001-002-fall-2024/final-project-jackma2003
 
 Special Instructions for Using Form and / or Login
 ---
-(TODO: if your app requires special instructions to use or if your app requires authentication, add information here; otherwise, leave blank)
+Login/Registration Page
+1. Register for an account 
+2. Once done it will take you to the dashboard, you can only create and delete the projects right now
+3. Log out and try logging in, it will work as intended
+
+Dashboard
+1. Only works if you have an account, right now you can only create a project and delete it
 
 URL for deployed site 
 ---
@@ -15,7 +21,8 @@ URL for deployed site
 
 URL for form 
 ---
-(TODO: add link to a functioning form)
+API Endpoints for the login/registration page (password reset still work in progress)
+https://github.com/nyu-csci-ua-0467-001-002-fall-2024/final-project-jackma2003/blob/master/routes/user.mjs
 
 URL for form result
 ---
@@ -23,4 +30,5 @@ URL for form result
 
 URL to github that shows line of code where research topic(s) are used / implemented
 --- 
-(TODO: add link to github url that shows line or lines of code that demonstrate in progress work on at least one research topic)
+Research Topics: React, Tailwind 
+https://github.com/nyu-csci-ua-0467-001-002-fall-2024/final-project-jackma2003/blob/master/src/login.jsx
