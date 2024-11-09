@@ -3,7 +3,6 @@ import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useParams, useNavigate } from "react-router-dom";
 import { PlusCircle, Clock, User, Tag, ArrowLeft } from "lucide-react";
-import "./input.css";
 
 // Task card component 
 const TaskCard = ({ task, index, moveTask, status }) => {
@@ -86,6 +85,8 @@ const ProjectBoard = () => {
     const [project, setProject] = useState(null);
     const [tasks, setTasks] = useState([]);
     const [showNewTask, setShowNewTask] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
     const [newTask, setNewTask] = useState({
         title: "",
         description: "",
@@ -95,7 +96,6 @@ const ProjectBoard = () => {
         labels: [],
     });
 
-    // Define fetchData function before using it in useEffect
     const fetchData = async () => {
         setIsLoading(true);
         setError("");
@@ -153,47 +153,6 @@ const ProjectBoard = () => {
         
         fetchData();
     }, [id, navigate]);
-
-    useEffect(() => {
-        if (!localStorage.getItem("token")) {
-            navigate("/login");
-            return;
-        }
-        fetchProject();
-        fetchTasks();
-    }, [id, navigate]);
-
-    const fetchProject = async () => {
-        try {
-            const response = await fetch(`/api/projects/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-            if (!response.ok) throw new Error('Failed to fetch project');
-            const data = await response.json();
-            setProject(data);
-        }
-        catch (error) {
-            console.error("Error fetching project:", error);
-        }
-    };
-
-    const fetchTasks = async () => {
-        try {
-            const response = await fetch(`/api/tasks/project/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-            if (!response.ok) throw new Error('Failed to fetch tasks');
-            const data = await response.json();
-            setTasks(data);
-        }
-        catch (error) {
-            console.error("Error fetching tasks:", error);
-        }
-    };
 
     const moveTask = async (taskId, newStatus) => {
         try {
@@ -254,14 +213,50 @@ const ProjectBoard = () => {
         }
     };
 
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                <div className="text-xl text-gray-600">Loading project board...</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gray-100 p-4">
+                <div className="max-w-7xl mx-auto">
+                    <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-md">
+                        <h3 className="text-lg font-medium">Error</h3>
+                        <p>{error}</p>
+                        <button 
+                            onClick={() => navigate('/dashboard')}
+                            className="mt-4 flex items-center text-red-700 hover:text-red-800"
+                        >
+                            <ArrowLeft className="h-4 w-4 mr-2" />
+                            Back to Dashboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="min-h-screen bg-gray-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">
-                            {project?.name} Board
-                        </h2>
+                        <div className="flex items-center space-x-4">
+                            <button 
+                                onClick={() => navigate('/dashboard')}
+                                className="text-gray-600 hover:text-gray-900"
+                            >
+                                <ArrowLeft className="h-6 w-6" />
+                            </button>
+                            <h2 className="text-2xl font-bold text-gray-900">
+                                {project?.name} Board
+                            </h2>
+                        </div>
                         <button 
                             onClick={() => setShowNewTask(true)} 
                             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
