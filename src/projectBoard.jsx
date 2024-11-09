@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useParams, useNavigate } from "react-router-dom";
-import { PlusCircle, Clock, User, Tag } from "lucide-react";
+import { PlusCircle, Clock, User, Tag, ArrowLeft } from "lucide-react";
 import "./input.css";
 
 // Task card component 
@@ -83,6 +83,61 @@ const Column = ({ status, tasks, moveTask }) => {
 const ProjectBoard = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [project, setProject] = useState(null);
+    const [tasks, setTasks] = useState([]);
+    const [showNewTask, setShowNewTask] = useState(false);
+    const [newTask, setNewTask] = useState({
+        title: "",
+        description: "",
+        status: "todo",
+        priority: "medium",
+        dueDate: new Date().toISOString().split("T")[0],
+        labels: [],
+    });
+
+    // Define fetchData function before using it in useEffect
+    const fetchData = async () => {
+        setIsLoading(true);
+        setError("");
+        try {
+            console.log("Fetching project data for id:", id);
+            const projectResponse = await fetch(`/api/projects/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+
+            if (!projectResponse.ok) {
+                const errorData = await projectResponse.json();
+                throw new Error(errorData.message || 'Failed to fetch project');
+            }
+
+            const projectData = await projectResponse.json();
+            console.log("Project data:", projectData);
+            setProject(projectData);
+
+            console.log("Fetching tasks for project:", id);
+            const tasksResponse = await fetch(`/api/tasks/project/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+
+            if (!tasksResponse.ok) {
+                const errorData = await tasksResponse.json();
+                throw new Error(errorData.message || 'Failed to fetch tasks');
+            }
+
+            const tasksData = await tasksResponse.json();
+            console.log("Tasks data:", tasksData);
+            setTasks(tasksData);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
         console.log("ProjectBoard mounted");
@@ -98,18 +153,6 @@ const ProjectBoard = () => {
         
         fetchData();
     }, [id, navigate]);
-
-    const [project, setProject] = useState(null);
-    const [tasks, setTasks] = useState([]);
-    const [showNewTask, setShowNewTask] = useState(false);
-    const [newTask, setNewTask] = useState({
-        title: "",
-        description: "",
-        status: "todo",
-        priority: "medium",
-        dueDate: new Date().toISOString().split("T")[0],
-        labels: [],
-    });
 
     useEffect(() => {
         if (!localStorage.getItem("token")) {
