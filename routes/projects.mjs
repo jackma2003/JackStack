@@ -65,17 +65,23 @@ router.post("/dashboard", authenticateToken, async(req, res) => {
 router.get("/:id", authenticateToken, async(req, res) => {
     try {
         const project = await Project.findById(req.params.id).populate("owner", "username").populate("members", "username");
+        
         if (!project) {
-            return res.status(404).json({ message: "Project not found "});
+            return res.status(404).json({ message: "Project not found" });
         }
 
         // Check if user has access to the project 
-        if (!project.members.includes(req.user.userId) && project.owner !== req.user.userId) {
-            return res.status(403).json({ message: "Access denied "});
+        const isOwner = project.owner._id.toString() === req.user.userId;
+        const isMember = project.members.some(member => member._id.toString() === req.user.userId);
+
+        if (!isOwner && !isMember) {
+            return res.status(403).json({ message: "Access denied" });
         }
+
         res.json(project);
     }
     catch (err) {
+        console.error("Error in get project by id:", err);
         res.status(500).json({ message: err.message });
     }
 });

@@ -106,34 +106,34 @@ const ProjectBoard = () => {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             });
-
-            if (!projectResponse.ok) {
-                const errorData = await projectResponse.json();
-                throw new Error(errorData.message || 'Failed to fetch project');
-            }
-
+    
             const projectData = await projectResponse.json();
+    
+            if (!projectResponse.ok) {
+                throw new Error(projectData.message || 'Failed to fetch project');
+            }
+    
             console.log("Project data:", projectData);
             setProject(projectData);
-
+    
             console.log("Fetching tasks for project:", id);
             const tasksResponse = await fetch(`/api/tasks/project/${id}`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             });
-
-            if (!tasksResponse.ok) {
-                const errorData = await tasksResponse.json();
-                throw new Error(errorData.message || 'Failed to fetch tasks');
-            }
-
+    
             const tasksData = await tasksResponse.json();
+    
+            if (!tasksResponse.ok) {
+                throw new Error(tasksData.message || 'Failed to fetch tasks');
+            }
+    
             console.log("Tasks data:", tasksData);
             setTasks(tasksData);
         } catch (error) {
             console.error("Error fetching data:", error);
-            setError(error.message);
+            setError(error.message || "Failed to load project");
         } finally {
             setIsLoading(false);
         }
