@@ -182,6 +182,9 @@ const ProjectBoard = () => {
     const handleCreateTask = async (e) => {
         e.preventDefault();
         try {
+            console.log("Creating task for project:", id);
+            console.log("Task data:", { ...newTask, project: id });
+
             const response = await fetch(`/api/tasks/create`, {
                 method: "POST",
                 headers: {
@@ -190,26 +193,33 @@ const ProjectBoard = () => {
                 },
                 body: JSON.stringify({
                     ...newTask,
-                    project: id
+                    project: id,
+                    creator: JSON.parse(localStorage.getItem("user"))?.userId,
+                    position: tasks.filter(t => t.status === "todo").length // Add as last item in todo
                 }),
             });
+
+            const data = await response.json();
             
-            if (response.ok) {
-                const createdTask = await response.json();
-                setTasks((prevTasks) => [...prevTasks, createdTask]);
-                setShowNewTask(false);
-                setNewTask({
-                    title: "",
-                    description: "",
-                    status: "todo",
-                    priority: "medium",
-                    dueDate: new Date().toISOString().split("T")[0],
-                    labels: [],
-                });
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to create task");
             }
+
+            console.log("Created Task:", data);
+            setTasks((prevTasks) => [...prevTasks, data]);
+            setShowNewTask(false);
+            setNewTask({
+                title: "",
+                description: "",
+                status: "todo",
+                priority: "medium",
+                dueDate: new Date().toISOString().split("T")[0],
+                labels: [],
+            });     
         }
         catch (error) {
             console.error("Error creating task:", error);
+            alert("Failed to create task: " + error.message);
         }
     };
 
@@ -282,7 +292,7 @@ const ProjectBoard = () => {
                         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
                             <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
                                 <h3 className="text-lg font-medium text-gray-900 mb-4">
-                                    Create New Task
+                                    Create New Task for {project?.name}
                                 </h3>
                                 <form onSubmit={handleCreateTask}>
                                     <div className="space-y-4">
@@ -293,8 +303,12 @@ const ProjectBoard = () => {
                                             <input
                                                 type="text"
                                                 value={newTask.title}
-                                                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                                                onChange={(e) => {
+                                                    console.log("Updating title:", e.target.value);
+                                                    setNewTask({ ...newTask, title: e.target.value });
+                                                }}
                                                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                                                placeholder="Enter task title"
                                                 required
                                             />
                                         </div>
@@ -307,6 +321,7 @@ const ProjectBoard = () => {
                                                 onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                                                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
                                                 rows={3}
+                                                placeholder="Describe the task"
                                             />
                                         </div>
                                         <div>
@@ -332,13 +347,17 @@ const ProjectBoard = () => {
                                                 value={newTask.dueDate}
                                                 onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
                                                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                                                min={new Date().toISOString().split('T')[0]}
                                             />
                                         </div>
                                     </div>
                                     <div className="mt-6 flex justify-end space-x-3">
                                         <button
                                             type="button"
-                                            onClick={() => setShowNewTask(false)}
+                                            onClick={() => {
+                                                console.log("Cancelling task creation");
+                                                setShowNewTask(false);
+                                            }}
                                             className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                                         >
                                             Cancel

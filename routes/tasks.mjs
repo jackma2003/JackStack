@@ -53,24 +53,27 @@ router.get("/project/:projectId", authenticateToken, async (req, res) => {
 router.post('/create', authenticateToken, async (req, res) => {
     try {
         // Verify user has access to this project
-        const project = await Project.findById(req.body.projectId);
+        const project = await Project.findById(req.body.project);
         if (!project) {
             return res.status(404).json({ message: "Project not found" });
         }
         
-        if (project.owner.toString() !== req.user.userId && 
-            !project.members.includes(req.user.userId)) {
+        // Check if user has access to the project 
+        const isOwner = project.owner.toString() === req.user.userId;
+        const isMember = project.members.map(m => m.toString()).includes(req.user.userId);
+        
+        if (!isOwner && !isMember) {
             return res.status(403).json({ message: "Access denied" });
         }
 
         // Get max position for the status
         const maxPositionTask = await Task.findOne({ 
-            project: req.body.projectId, 
+            project: req.body.project,
             status: req.body.status || 'todo' 
         }).sort({ position: -1 });
 
         const task = new Task({
-            project: req.body.projectId,
+            project: req.body.project,
             title: req.body.title,
             description: req.body.description,
             status: req.body.status || 'todo',
@@ -85,12 +88,14 @@ router.post('/create', authenticateToken, async (req, res) => {
 
         const newTask = await task.save();
         const populatedTask = await Task.findById(newTask._id)
-            .populate("assignee", "username avatar")
-            .populate("creator", "username avatar");
+            .populate("assignee", "username")
+            .populate("creator", "username");
         
+        console.log("Created new task:", populatedTask);
         res.status(201).json(populatedTask);
     } 
     catch (err) {
+        console.error("Error creating task:", err);
         res.status(400).json({ message: err.message });
     }
 });

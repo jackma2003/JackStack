@@ -18,7 +18,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/dashboard" element={<Dashboard/>} />
-          <Route path="/create-task" element={<TaskForm />} />
           <Route path="/reset-password/:token" element={<ResetPassword/>}/>
           <Route path="/project/:id" element={<ProjectBoard/>}/>
         </Routes>
