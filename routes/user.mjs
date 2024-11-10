@@ -197,4 +197,60 @@ router.post("/reset-password/:token", async (req, res) => {
     }
 });
 
+// update user profile 
+router.patch("/profile", authenticateToken, async (req, res) => {
+    try {
+        const { username, email, currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.user.userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Check if email is already taken by another user 
+        if (email !== user.email) {
+            const emailExists = await User.findOne({ email, _id: { $ne: user._id } });
+            if (emailExists) {
+                return res.status(400).json({ message: 'Email already in use' });
+            }
+        }
+
+        // Check if username is already taken by another user
+        if (username !== user.username) {
+            const usernameExists = await User.findOne({ username, _id: { $ne: user._id } });
+            if (usernameExists) {
+                return res.status(400).json({ message: 'Username already taken' });
+            }
+        }
+
+        // If changing password, verify current password
+        if (newPassword) {
+            const isMatch = await bcrypt.compare(currentPassword, user.hash);
+            if (!isMatch) {
+                return res.status(401).json({ message: 'Current password is incorrect' });
+            }
+            // Hash new password
+            const salt = await bcrypt.genSalt(10);
+            user.hash = await bcrypt.hash(newPassword, salt);
+        }
+
+        user.username = username;
+        user.email = email;
+        await user.save();
+
+        res.json({
+            message: "Profile updated successfully",
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            }
+        });
+    }
+    catch (err) {
+        console.error("Profile update error:", err);
+        res.status(500).json({ message: "Error updating profile" });
+    }
+});
+
 export default router;
