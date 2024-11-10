@@ -14,16 +14,30 @@ const TaskCard = ({ task, index, moveTask, status, onEdit, onDelete, onAddCommen
         }),
     });
 
-    // Comment section 
     const [showComments, setShowComments] = useState(false);
     const [newComment, setNewComment] = useState("");
 
     const handleAddComment = async (e) => {
         e.preventDefault();
         if (!newComment.trim()) return;
-        await onAddComment(task._id, newComment);
-        setNewComment("")
-    }
+        
+        try {
+            await onAddComment(task._id, newComment);
+            setNewComment("");
+        } catch (error) {
+            console.error("Error adding comment:", error);
+        }
+    };
+
+    const handleEdit = (e) => {
+        e.stopPropagation();
+        onEdit(task);
+    };
+
+    const handleDelete = (e) => {
+        e.stopPropagation();
+        onDelete(task._id);
+    };
 
     return (
         <div ref={drag} className={`p-4 mb-2 bg-white rounded-lg shadow ${isDragging ? "opacity-50" : ""}`}>
@@ -31,13 +45,13 @@ const TaskCard = ({ task, index, moveTask, status, onEdit, onDelete, onAddCommen
                 <h4 className="font-medium text-gray-900">{task.title}</h4>
                 <div className="flex items-center space-x-2">
                     <button 
-                        onClick={() => onEdit(task)}
+                        onClick={handleEdit}
                         className="text-gray-400 hover:text-blue-500"
                     >
                         <Edit className="h-4 w-4" />
                     </button>
                     <button 
-                        onClick={() => onDelete(task._id)}
+                        onClick={handleDelete}
                         className="text-gray-400 hover:text-red-500"
                     >
                         <Trash2 className="h-4 w-4" />
@@ -117,6 +131,7 @@ const TaskCard = ({ task, index, moveTask, status, onEdit, onDelete, onAddCommen
         </div>
     );
 };
+
 
 // Column Component 
 const Column = ({ status, tasks, moveTask, onEdit, onDelete, onAddComment }) => {
