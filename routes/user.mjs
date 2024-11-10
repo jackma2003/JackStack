@@ -4,6 +4,26 @@ import jwt from 'jsonwebtoken';
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 import { User } from '../db.mjs';
+import jwt from "jsonwebtoken";
+
+// Middleware to verify JWT token 
+export const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({ message: "Authentication required "});
+    }
+
+    try {
+        const user = jwt.verify(token, process.env.JWT_SECRET || "your-secret-key");
+        req.user = user;
+        next();
+    }
+    catch (err) {
+        return res.status(403).json({ message: "Invalid token "});
+    }
+};
 
 const router = express.Router();
 
