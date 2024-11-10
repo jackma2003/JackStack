@@ -108,17 +108,29 @@ router.patch('/:taskId', authenticateToken, async (req, res) => {
             return res.status(404).json({ message: "Task not found" });
         }
 
+        // Verify user has access to the project 
+        const project = await Project.findById(task.project);
+        if (!project) {
+            return res.status(404).json({ message: "Project not found" });
+        }
+
+        const isOwner = project.owner.toString() === req.user.userId;
+        const isMember = project.members.map(m => m.toString()).includes(req.user.userId);
+
+        if (!isOwner && !isMember) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         // If status is changing, update positions
         if (req.body.status && req.body.status !== task.status) {
             // Get all tasks in the new status column
             const tasksInNewStatus = await Task.find({
-                project: req.params.projectId,
+                project: task.project,
                 status: req.body.status
-            }).sort({ position: 1 });
+            }).sort({ position: -1 });
 
-            req.body.position = tasksInNewStatus.length > 0 
-                ? tasksInNewStatus[tasksInNewStatus.length - 1].position + 1 
-                : 0;
+            req.body.position = tasksInNewStatus.length > 0
+                ? tasksInNewStatus[0].position + 1 : 0
         }
 
         const updatedTask = await Task.findByIdAndUpdate(
@@ -145,9 +157,23 @@ router.post('/:taskId/comments', authenticateToken, async (req, res) => {
             return res.status(404).json({ message: "Task not found" });
         }
 
+        // Verify user has access to the project
+        const project = await Project.findById(task.project);
+        if (!project) {
+            return res.status(404).json({ message: "Project not found" });
+        }
+
+        const isOwner = project.owner.toString() === req.user.userId;
+        const isMember = project.members.map(m => m.toString()).includes(req.user.userId);
+        
+        if (!isOwner && !isMember) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         task.comments.push({
             user: req.user.userId,
-            content: req.body.content
+            content: req.body.content,
+            createdAt: new Date()
         });
 
         await task.save();
@@ -160,6 +186,7 @@ router.post('/:taskId/comments', authenticateToken, async (req, res) => {
         res.json(updatedTask);
     }
     catch (err) {
+        console.error("Error adding comment:", err);
         res.status(400).json({ message: err.message });
     }
 });
@@ -172,18 +199,24 @@ router.delete('/:taskId', authenticateToken, async (req, res) => {
             return res.status(404).json({ message: "Task not found" });
         }
 
-        // Check if user is project owner or task creator
-        const project = await Project.findById(req.params.projectId);
-        if (project.owner.toString() !== req.user.userId && 
-            task.creator.toString() !== req.user.userId) {
+        // Check if user has access to delete
+        const project = await Project.findById(task.project);
+        if (!project) {
+            return res.status(404).json({ message: "Project not found" });
+        }
+
+        const isOwner = project.owner.toString() === req.user.userId;
+        const isCreator = task.creator.toString() === req.user.userId;
+        
+        if (!isOwner && isCreator) {
             return res.status(403).json({ message: "Not authorized to delete this task" });
         }
 
-        await task.deleteOne();
+        await Task.findByIdAndDelete(req.params.taskId);
 
         // Reorder remaining tasks in the same status
         const remainingTasks = await Task.find({
-            project: req.params.projectId,
+            project: task.project,
             status: task.status
         }).sort({ position: 1 });
 

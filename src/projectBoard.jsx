@@ -15,7 +15,7 @@ const TaskCard = ({ task, index, moveTask, status, onEdit, onDelete, onAddCommen
     });
 
     // Comment section 
-    const [showComments, setShowComments] = useState("false");
+    const [showComments, setShowComments] = useState(false);
     const [newComment, setNewComment] = useState("");
 
     const handleAddComment = async (e) => {
@@ -119,7 +119,7 @@ const TaskCard = ({ task, index, moveTask, status, onEdit, onDelete, onAddCommen
 };
 
 // Column Component 
-const Column = ({ status, tasks, moveTask }) => {
+const Column = ({ status, tasks, moveTask, onEdit, onDelete, onAddComment }) => {
     const [{ isOver }, drop] = useDrop({
         accept: "TASK",
         drop: (item) => moveTask(item.id, status),
@@ -143,6 +143,9 @@ const Column = ({ status, tasks, moveTask }) => {
                         index={index} 
                         moveTask={moveTask} 
                         status={status}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                        onAddComment={onAddComment}
                     />
                 ))}
         </div>
@@ -188,8 +191,8 @@ const ProjectBoard = () => {
 
             if (response.ok) {
                 const updatedTask = await response.json();
-                (prevTasks =>
-                    prevTasks.map(task =>
+                setTasks(prevTasks =>
+                    prevTasks.map(task => 
                         task._id === updatedTask._id ? updatedTask : task
                 ));
                 setShowEditTask(false);
