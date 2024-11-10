@@ -196,7 +196,10 @@ const ProjectBoard = () => {
                         task._id === updatedTask._id ? updatedTask : task
                 ));
                 setShowEditTask(false);
-                setEditingTask(null); 
+                setEditingTask(null);
+                
+                // Refreshes the tasks after updating it 
+                fetchData();
             }
         }
         catch (error) {
