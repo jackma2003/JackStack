@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 import { User } from '../db.mjs';
-import jwt from "jsonwebtoken";
 
 // Middleware to verify JWT token 
 export const authenticateToken = (req, res, next) => {
