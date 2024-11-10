@@ -188,12 +188,17 @@ const ProjectBoard = () => {
     });
 
     const handleEditTask = (task) => {
-        setEditingTask(task);
+        console.log("Edit task clicked:", task);
+        setEditingTask({
+            ...task,
+            dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : null
+        });
         setShowEditTask(true);
-    }
+    };
 
     const handleUpdateTask = async (e) => {
         e.preventDefault();
+        console.log("Update task submitted:", editingTask);
         try {
             const response = await fetch(`/api/tasks/${editingTask._id}`, {
                 method: "PATCH",
@@ -203,40 +208,48 @@ const ProjectBoard = () => {
                 },
                 body: JSON.stringify(editingTask),
             });
-
-            if (response.ok) {
-                const updatedTask = await response.json();
-                setTasks(prevTasks =>
-                    prevTasks.map(task => 
-                        task._id === updatedTask._id ? updatedTask : task
-                ));
-                setShowEditTask(false);
-                setEditingTask(null);
-                
-                // Refreshes the tasks after updating it 
-                fetchData();
+    
+            const data = await response.json();
+            console.log("Update task response:", data);
+    
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to update task");
             }
+    
+            setTasks(prevTasks =>
+                prevTasks.map(task => 
+                    task._id === data._id ? data : task
+            ));
+            setShowEditTask(false);
+            setEditingTask(null);
         }
         catch (error) {
             console.error("Error updating task:", error);
-            alert("Failed to update task:" + error.message);
+            alert("Failed to update task: " + error.message);
         }
     };
 
     const handleDeleteTask = async (taskId) => {
+        console.log("Delete task clicked:", taskId);
         if (!window.confirm("Are you sure you want to delete this task?")) return;
-
+    
         try {
             const response = await fetch(`/api/tasks/${taskId}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json"
                 },
             });
-
-            if (response.ok) {
-                setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
+    
+            const data = await response.json();
+            console.log("Delete response:", data);
+    
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to delete task");
             }
+    
+            setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
         }
         catch (error) {
             console.error("Error deleting task:", error);
@@ -245,8 +258,9 @@ const ProjectBoard = () => {
     };
 
     const handleAddComment = async (taskId, content) => {
+        console.log("Add comment clicked:", { taskId, content });
         try {
-            const response = await fetch (`/api/tasks/${taskId}/comments`, {
+            const response = await fetch(`/api/tasks/${taskId}/comments`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -254,14 +268,19 @@ const ProjectBoard = () => {
                 },
                 body: JSON.stringify({ content }),
             });
-
-            if (response.ok) {
-                const updatedTask = await response.json();
-                setTasks(prevTasks =>
-                    prevTasks.map(task =>
-                        task._id === updatedTask._id ? updatedTask : task
-                ));
+    
+            const data = await response.json();
+            console.log("Add comment response:", data);
+    
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to add comment");
             }
+    
+            setTasks(prevTasks =>
+                prevTasks.map(task =>
+                    task._id === data._id ? data : task
+                )
+            );
         }
         catch (error) {
             console.error("Error adding comment:", error);

@@ -103,6 +103,9 @@ router.post('/create', authenticateToken, async (req, res) => {
 // Update task
 router.patch('/:taskId', authenticateToken, async (req, res) => {
     try {
+        console.log("Updating task:", req.params.taskId);
+        console.log("Update data:", req.body);
+
         const task = await Task.findById(req.params.taskId);
         if (!task) {
             return res.status(404).json({ message: "Task not found" });
@@ -123,6 +126,7 @@ router.patch('/:taskId', authenticateToken, async (req, res) => {
 
         // If status is changing, update positions
         if (req.body.status && req.body.status !== task.status) {
+            console.log("Status changing from", task.status, "to", req.body.status);
             // Get all tasks in the new status column
             const tasksInNewStatus = await Task.find({
                 project: task.project,
@@ -130,7 +134,7 @@ router.patch('/:taskId', authenticateToken, async (req, res) => {
             }).sort({ position: -1 });
 
             req.body.position = tasksInNewStatus.length > 0
-                ? tasksInNewStatus[0].position + 1 : 0
+                ? tasksInNewStatus[0].position + 1 : 0;
         }
 
         const updatedTask = await Task.findByIdAndUpdate(
@@ -142,9 +146,11 @@ router.patch('/:taskId', authenticateToken, async (req, res) => {
         .populate("creator", "username avatar")
         .populate("comments.user", "username avatar");
 
+        console.log("Task updated successfully:", updatedTask);
         res.json(updatedTask);
     }
     catch (err) {
+        console.error("Error updating task:", err);
         res.status(400).json({ message: err.message });
     }
 });
@@ -152,6 +158,9 @@ router.patch('/:taskId', authenticateToken, async (req, res) => {
 // Add comment to task
 router.post('/:taskId/comments', authenticateToken, async (req, res) => {
     try {
+        console.log("Adding comment to task:", req.params.taskId);
+        console.log("Comment data:", req.body);
+
         const task = await Task.findById(req.params.taskId);
         if (!task) {
             return res.status(404).json({ message: "Task not found" });
@@ -170,9 +179,14 @@ router.post('/:taskId/comments', authenticateToken, async (req, res) => {
             return res.status(403).json({ message: "Access denied" });
         }
 
+        // Validate comment content
+        if (!req.body.content || !req.body.content.trim()) {
+            return res.status(400).json({ message: "Comment content is required" });
+        }
+
         task.comments.push({
             user: req.user.userId,
-            content: req.body.content,
+            content: req.body.content.trim(),
             createdAt: new Date()
         });
 
@@ -183,6 +197,7 @@ router.post('/:taskId/comments', authenticateToken, async (req, res) => {
             .populate("creator", "username avatar")
             .populate("comments.user", "username avatar");
 
+        console.log("Comment added successfully");
         res.json(updatedTask);
     }
     catch (err) {
@@ -208,7 +223,7 @@ router.delete('/:taskId', authenticateToken, async (req, res) => {
         const isOwner = project.owner.toString() === req.user.userId;
         const isCreator = task.creator.toString() === req.user.userId;
         
-        if (!isOwner && isCreator) {
+        if (!isOwner && !isCreator) {
             return res.status(403).json({ message: "Not authorized to delete this task" });
         }
 
@@ -226,12 +241,14 @@ router.delete('/:taskId', authenticateToken, async (req, res) => {
             });
         }
 
-        res.json({ message: "Task deleted" });
+        res.json({ message: "Task deleted successfully" });
     }
     catch (err) {
+        console.error("Error deleting task:", err);
         res.status(500).json({ message: err.message });
     }
 });
+
 
 // Reorder tasks
 router.patch('/reorder/:taskId', authenticateToken, async (req, res) => {
