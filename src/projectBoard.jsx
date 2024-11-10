@@ -17,47 +17,64 @@ const TaskCard = ({ task, index, moveTask, status, onEdit, onDelete, onAddCommen
     const [showComments, setShowComments] = useState(false);
     const [newComment, setNewComment] = useState("");
 
-    const handleAddComment = async (e) => {
-        e.preventDefault();
-        if (!newComment.trim()) return;
-        
-        try {
-            await onAddComment(task._id, newComment);
-            setNewComment("");
-        } catch (error) {
-            console.error("Error adding comment:", error);
-        }
-    };
+    // Add console log to verify props
+    console.log("TaskCard props:", { task, onEdit, onDelete, onAddComment });
 
     const handleEdit = (e) => {
         e.stopPropagation();
-        onEdit(task);
+        if (typeof onEdit === 'function') {
+            onEdit(task);
+        } else {
+            console.error("onEdit is not a function:", onEdit);
+        }
     };
 
     const handleDelete = (e) => {
         e.stopPropagation();
-        onDelete(task._id);
+        if (typeof onDelete === 'function') {
+            onDelete(task._id);
+        } else {
+            console.error("onDelete is not a function:", onDelete);
+        }
+    };
+
+    const handleAddComment = async (e) => {
+        e.preventDefault();
+        if (!newComment.trim()) return;
+        
+        if (typeof onAddComment === 'function') {
+            try {
+                await onAddComment(task._id, newComment);
+                setNewComment("");
+            } catch (error) {
+                console.error("Error adding comment:", error);
+            }
+        } else {
+            console.error("onAddComment is not a function:", onAddComment);
+        }
     };
 
     return (
         <div ref={drag} className={`p-4 mb-2 bg-white rounded-lg shadow ${isDragging ? "opacity-50" : ""}`}>
-            <div className="flex justify-between items-start mb-2">
-                <h4 className="font-medium text-gray-900">{task.title}</h4>
-                <div className="flex items-center space-x-2">
-                    <button 
-                        onClick={handleEdit}
-                        className="text-gray-400 hover:text-blue-500"
-                    >
-                        <Edit className="h-4 w-4" />
-                    </button>
-                    <button 
-                        onClick={handleDelete}
-                        className="text-gray-400 hover:text-red-500"
-                    >
-                        <Trash2 className="h-4 w-4" />
-                    </button>
-                </div>
+        <div className="flex justify-between items-start mb-2">
+            <h4 className="font-medium text-gray-900">{task.title}</h4>
+            <div className="flex items-center space-x-2">
+                <button 
+                    type="button"
+                    onClick={handleEdit}
+                    className="text-gray-400 hover:text-blue-500"
+                >
+                    <Edit className="h-4 w-4"/>
+                </button>
+                <button 
+                    type="button"
+                    onClick={handleDelete}
+                    className="text-gray-400 hover:text-red-500"
+                >
+                    <Trash2 className="h-4 w-4"/>
+                </button>
             </div>
+        </div>
             
             <p className="mt-1 text-sm text-gray-500">{task.description}</p>
             
@@ -88,8 +105,9 @@ const TaskCard = ({ task, index, moveTask, status, onEdit, onDelete, onAddCommen
                 </div>
             )}
 
-            <div className="mt-3 pt-3 border-t">
+<div className="mt-3 pt-3 border-t">
                 <button
+                    type="button"
                     onClick={() => setShowComments(!showComments)}
                     className="text-sm text-gray-500 hover:text-gray-700 flex items-center space-x-1"
                 >
@@ -143,6 +161,9 @@ const Column = ({ status, tasks, moveTask, onEdit, onDelete, onAddComment }) => 
         }),
     });
 
+    // Add console log to verify props
+    console.log("Column props:", { status, onEdit, onDelete, onAddComment });
+
     return (
         <div ref={drop} className={`bg-gray-100 p-4 rounded-lg w-80 ${isOver ? "bg-gray-200" : ""}`}>
             <h3 className="font-medium text-gray-900 mb-4">
@@ -189,10 +210,7 @@ const ProjectBoard = () => {
 
     const handleEditTask = (task) => {
         console.log("Edit task clicked:", task);
-        setEditingTask({
-            ...task,
-            dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : null
-        });
+        setEditingTask(task);
         setShowEditTask(true);
     };
 
