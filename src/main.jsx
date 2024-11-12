@@ -8,6 +8,7 @@ import Dashboard from "./dashboard"
 import ResetPassword from './resetPassword';
 import ProjectBoard from './projectBoard'
 import ProfileSettings from './profileSettings'
+import EditProject from './editProject'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -21,6 +22,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/reset-password/:token" element={<ResetPassword/>}/>
           <Route path="/project/:id" element={<ProjectBoard/>}/>
           <Route path="/profile" element={<ProfileSettings/>}/>
+          <Route path="/project/:id/edit" element={<EditProject/>}/>
         </Routes>
       </div>
     </BrowserRouter>
