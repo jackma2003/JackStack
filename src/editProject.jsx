@@ -42,8 +42,16 @@ const EditProject = () => {
         }
     };
 
+    const handleChange = (e) => {
+        const {name, value } = e.target;
+        setProject(prev => ({
+            ...prev, 
+            [name]: value
+        }))
+    }
+
     const handleSubmit = async (e) => {
-        e.preventdefault();
+        e.preventDefault();
         setIsSaving(true);
         setError("");
 
@@ -51,7 +59,7 @@ const EditProject = () => {
             const response = await fetch(`/api/projects/${id}`, {
                 method: "PATCH",
                 headers: {
-                    "Content-Type": "application.json",
+                    "Content-Type": "application/json",
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 },
                 body: JSON.stringify({
@@ -103,7 +111,7 @@ const EditProject = () => {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <label htmlFor="name" className="block-text-sm font-medium text-gray-700">
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                                 Project Name
                             </label>
                             <input 
