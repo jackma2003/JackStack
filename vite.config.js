@@ -9,12 +9,18 @@ const __dirname = dirname(__filename)
 export default defineConfig({
   plugins: [react()],
   build: {
-     outDir: "dist",
+    outDir: "dist",
+    rollupOptions: {
+      external: ['socket.io-client'],
+    }
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
     },
+  },
+  optimizeDeps: {
+    include: ['socket.io-client'],
   },
   server: {
     port: 29366, // Frontend port
@@ -22,6 +28,11 @@ export default defineConfig({
       '/api': {
         target: 'http://linserv1.cims.nyu.edu:29366', // Backend port
         changeOrigin: true,
+      },
+      '/socket.io': {
+        target: 'http://linserv1.cims.nyu.edu:29366',
+        changeOrigin: true,
+        ws: true
       }
     }
   }
