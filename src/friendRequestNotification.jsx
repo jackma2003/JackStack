@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
-import { io } from 'socket.io-client';
-import './input.css'
+import { io } from '/node_modules/socket.io-client/dist/socket.io.esm.min.js';
+import './input.css';
 
 const FriendRequestNotifications = () => {
     const [socket, setSocket] = useState(null);
