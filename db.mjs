@@ -3,6 +3,18 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+// Friend Request Schema
+const FriendRequestSchema = new mongoose.Schema({
+    sender: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    receiver: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    status: {
+        type: String, 
+        enum: ["pending", "accepted", "rejected"],
+        default: "pending"
+    },
+    createdAt: { type: Date, default: Date.now }
+});
+
 // User schema
 // * users require authentication 
 // * users can have 0 or more projects 
@@ -16,7 +28,9 @@ const UserSchema = new mongoose.Schema({
     createdAt: {type: Date, default: Date.now},
     updatedAt: {type: Date, default: Date.now},
     resetPasswordToken: String, 
-    resetPasswordExpires: Date
+    resetPasswordExpires: Date,
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    FriendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "FriendRequest" }]
 });
 
 // Comment Schema (embedded in Task)
@@ -97,6 +111,7 @@ TaskSchema.pre('save', function(next) {
 export const User = mongoose.model('User', UserSchema);
 export const Task = mongoose.model('Task', TaskSchema);
 export const Project = mongoose.model('Project', ProjectSchema);
+export const FriendRequest = mongoose.model('FriendRequest', FriendRequestSchema);
 
 // Connect to MongoDB
 export const connectDB = async () => {
