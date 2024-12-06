@@ -1,10 +1,6 @@
-// findFriends.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, UserPlus, ArrowLeft, Check, X } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Search, UserPlus, ArrowLeft, Check } from 'lucide-react';
 import './input.css'
 
 const FindFriends = () => {
@@ -62,7 +58,6 @@ const FindFriends = () => {
                 throw new Error(data.message);
             }
 
-            // Mark request as sent
             setSentRequests(prev => new Set([...prev, userId]));
         } catch (err) {
             setError('Failed to send friend request');
@@ -75,31 +70,34 @@ const FindFriends = () => {
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="flex items-center mb-8">
-                    <Button
-                        variant="ghost"
+                    <button
                         onClick={() => navigate('/dashboard')}
-                        className="mr-4"
+                        className="mr-4 p-2 rounded hover:bg-gray-200"
                     >
                         <ArrowLeft className="h-5 w-5" />
-                    </Button>
+                    </button>
                     <h1 className="text-2xl font-bold">Find Friends</h1>
                 </div>
 
                 {/* Search Section */}
-                <Card className="p-6 mb-8">
+                <div className="bg-white rounded-lg shadow p-6 mb-8">
                     <div className="flex gap-4">
-                        <Input
+                        <input
                             type="text"
                             placeholder="Search users by username or email"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && searchUsers()}
-                            className="flex-1"
+                            className="flex-1 px-4 py-2 border rounded-md"
                         />
-                        <Button onClick={searchUsers} disabled={loading}>
+                        <button 
+                            onClick={searchUsers} 
+                            disabled={loading}
+                            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                        >
                             <Search className="h-4 w-4 mr-2" />
                             Search
-                        </Button>
+                        </button>
                     </div>
 
                     {error && (
@@ -107,7 +105,7 @@ const FindFriends = () => {
                             {error}
                         </div>
                     )}
-                </Card>
+                </div>
 
                 {/* Results Section */}
                 <div className="space-y-4">
@@ -115,7 +113,7 @@ const FindFriends = () => {
                         <div className="text-center py-8">Searching...</div>
                     ) : users.length > 0 ? (
                         users.map((user) => (
-                            <Card key={user._id} className="p-4">
+                            <div key={user._id} className="bg-white rounded-lg shadow p-4">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-4">
                                         {user.avatar ? (
@@ -142,16 +140,16 @@ const FindFriends = () => {
                                             <span>Request Sent</span>
                                         </div>
                                     ) : (
-                                        <Button
+                                        <button
                                             onClick={() => sendFriendRequest(user._id)}
-                                            variant="outline"
+                                            className="flex items-center px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                                         >
                                             <UserPlus className="h-4 w-4 mr-2" />
                                             Add Friend
-                                        </Button>
+                                        </button>
                                     )}
                                 </div>
-                            </Card>
+                            </div>
                         ))
                     ) : searchQuery && !loading && (
                         <div className="text-center py-8 text-gray-500">
