@@ -1,40 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
-import { io } from '/node_modules/socket.io-client/dist/socket.io.esm.min.js';
 import './input.css';
 
 const FriendRequestNotifications = () => {
-    const [socket, setSocket] = useState(null);
     const [requests, setRequests] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
 
     useEffect(() => {
-        // Initialize socket connection
-        const newSocket = io(process.env.REACT_APP_API_URL, {
-            auth: {
-                token: localStorage.getItem('token')
-            }
-        });
-
-        newSocket.on('connect', () => {
-            console.log('Connected to socket server');
-        });
-
-        newSocket.on('friendRequest', (data) => {
-            setRequests(prev => [...prev, data]);
-        });
-
-        newSocket.on('friendRequestAccepted', (data) => {
-            // Handle accepted request notification
-            console.log('Friend request accepted:', data);
-        });
-
-        setSocket(newSocket);
-
         // Fetch existing requests
         fetchRequests();
-
-        return () => newSocket.close();
     }, []);
 
     const fetchRequests = async () => {
