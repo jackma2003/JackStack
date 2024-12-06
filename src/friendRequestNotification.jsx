@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { io } from 'socket.io-client';
 import './input.css'
 
@@ -87,52 +85,49 @@ const FriendRequestNotifications = () => {
 
             {showDropdown && (
                 <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg z-50">
-                    <Card>
-                        <CardContent className="p-4">
-                            <h3 className="text-lg font-semibold mb-4">Friend Requests</h3>
-                            {requests.length === 0 ? (
-                                <p className="text-gray-500 text-center">No pending requests</p>
-                            ) : (
-                                <div className="space-y-4">
-                                    {requests.map((request) => (
-                                        <div key={request._id} className="flex items-center justify-between">
-                                            <div className="flex items-center space-x-3">
-                                                {request.sender.avatar ? (
-                                                    <img
-                                                        src={request.sender.avatar}
-                                                        alt={request.sender.username}
-                                                        className="h-10 w-10 rounded-full"
-                                                    />
-                                                ) : (
-                                                    <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                                        <span className="text-gray-500 text-lg">
-                                                            {request.sender.username[0].toUpperCase()}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                <span className="font-medium">{request.sender.username}</span>
-                                            </div>
-                                            <div className="flex space-x-2">
-                                                <Button
-                                                    size="sm"
-                                                    onClick={() => handleRequest(request._id, 'accepted')}
-                                                >
-                                                    Accept
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={() => handleRequest(request._id, 'rejected')}
-                                                >
-                                                    Reject
-                                                </Button>
-                                            </div>
+                    <div className="p-4 border rounded-lg">
+                        <h3 className="text-lg font-semibold mb-4">Friend Requests</h3>
+                        {requests.length === 0 ? (
+                            <p className="text-gray-500 text-center">No pending requests</p>
+                        ) : (
+                            <div className="space-y-4">
+                                {requests.map((request) => (
+                                    <div key={request._id} className="flex items-center justify-between">
+                                        <div className="flex items-center space-x-3">
+                                            {request.sender.avatar ? (
+                                                <img
+                                                    src={request.sender.avatar}
+                                                    alt={request.sender.username}
+                                                    className="h-10 w-10 rounded-full"
+                                                />
+                                            ) : (
+                                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                                    <span className="text-gray-500 text-lg">
+                                                        {request.sender.username[0].toUpperCase()}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            <span className="font-medium">{request.sender.username}</span>
                                         </div>
-                                    ))}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
+                                        <div className="flex space-x-2">
+                                            <button
+                                                className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                onClick={() => handleRequest(request._id, 'accepted')}
+                                            >
+                                                Accept
+                                            </button>
+                                            <button
+                                                className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                                                onClick={() => handleRequest(request._id, 'rejected')}
+                                            >
+                                                Reject
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>
