@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { PlusCircle, Settings, LogOut, ChevronDown, Clock, AlertCircle, Edit, Trash2, User } from "lucide-react";
+import { PlusCircle, Settings, LogOut, ChevronDown, Clock, AlertCircle, Edit, Trash2, User, UserPlus } from "lucide-react";
 import FriendRequestNotifications from "./friendRequestNotification";
 import "./input.css"
 

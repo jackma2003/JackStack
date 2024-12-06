@@ -3,6 +3,7 @@ import { Bell } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { io } from 'socket.io-client';
+import './input.css'
 
 const FriendRequestNotifications = () => {
     const [socket, setSocket] = useState(null);

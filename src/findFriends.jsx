@@ -5,6 +5,7 @@ import { Search, UserPlus, ArrowLeft, Check, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import './input.css'
 
 const FindFriends = () => {
     const navigate = useNavigate();
