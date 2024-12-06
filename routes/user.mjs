@@ -272,4 +272,31 @@ router.patch("/profile", authenticateToken, async (req, res) => {
     }
 });
 
+router.get("/search", authenticateToken, async (req, res) => {
+    try {
+        const { query } = req.query;
+        const currentUser = req.user.userId;
+
+        // Search for users by username or email, excluding curr user 
+        const users = await User.find({
+            $and: [
+                {
+                    $or: [
+                        { username: new RegExp(query, "i") },
+                        { email: new RegExp(query, "i") }
+                    ]
+                },
+                { _id: { $ne: currentUser } }
+            ]
+        })
+        .select("username email avatar")
+        .limit(10);
+        res.json(users);
+    }
+    catch (err) {
+        console.error("User search error:", err);
+        res.status(500).json({ message: "Error searching users" });
+    }
+});
+
 export default router;
