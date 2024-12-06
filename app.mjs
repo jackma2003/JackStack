@@ -11,7 +11,7 @@ import initializeSocket from './socket.mjs';
 import projectRoutes from './routes/projects.mjs';
 import taskRoutes from './routes/tasks.mjs';
 import userRoutes from './routes/user.mjs';
-import friendRoutes from './routes/friend-routes.mjs';
+import friendRoutes from './routes/friends.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
