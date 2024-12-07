@@ -26,8 +26,13 @@ const authenticateToken = (req, res, next) => {
 // Send friend request 
 router.post("/request", authenticateToken, async (req, res) => {
     try {
-        const {receiverId } = req.body;
+        const {receiverId} = req.body;
         const senderId = req.user.userId;
+
+        // Check if trying to add self
+        if (senderId === receiverId) {
+            return res.status(400).json({ message: "You cannot send a friend request to yourself" });
+        }
 
         // Check if request already exists 
         const existingRequest = await FriendRequest.findOne({
@@ -38,7 +43,21 @@ router.post("/request", authenticateToken, async (req, res) => {
         });
 
         if (existingRequest) {
-            return res.status(400).json({ message: "Request already exists "});
+            if (existingRequest.status === 'pending') {
+                return res.status(400).json({ 
+                    message: existingRequest.sender.toString() === senderId 
+                        ? "You already sent a friend request to this user" 
+                        : "This user has already sent you a friend request" 
+                });
+            } else if (existingRequest.status === 'accepted') {
+                return res.status(400).json({ message: "You are already friends with this user" });
+            }
+        }
+
+        // Check if they're already friends
+        const sender = await User.findById(senderId);
+        if (sender.friends.includes(receiverId)) {
+            return res.status(400).json({ message: "You are already friends with this user" });
         }
 
         // Create new friend request 
@@ -48,24 +67,16 @@ router.post("/request", authenticateToken, async (req, res) => {
         });
         await friendRequest.save();
 
-        // Add to receiver's friend request 
+        // Add to receiver's friend requests
         await User.findByIdAndUpdate(receiverId, {
-            $push: { friendRequests: friendRequest._id }
+            $push: { FriendRequests: friendRequest._id }
         });
 
-        // Emit socket event if receiver is online 
-        const receiverSocketId = req.app.get("connectedUsers").get(receiverId);
-        if (receiverSocketId) {
-            req.app.get("io").to(receiverSocketId).emit("friendRequest", {
-                requestId: friendRequest._id,
-                sender: await User.findById(senderId).select("username avatar")
-            });
-        }
-        res.status(201).json({ message: "Friend request sent "});
+        res.status(201).json({ message: "Friend request sent successfully" });
     }
     catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Error sending friend request "});
+        res.status(500).json({ message: "Error sending friend request" });
     }
 });
 

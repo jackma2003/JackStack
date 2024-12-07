@@ -40,7 +40,6 @@ const FindFriends = () => {
         }
     };
 
-    // Send friend request
     const sendFriendRequest = async (userId) => {
         try {
             const response = await fetch('/api/friends/request', {
@@ -51,17 +50,19 @@ const FindFriends = () => {
                 },
                 body: JSON.stringify({ receiverId: userId })
             });
-
+    
             const data = await response.json();
-
+    
             if (!response.ok) {
-                throw new Error(data.message);
+                // Show the error message from the server
+                setError(data.message);
+                return;
             }
-
+    
             setSentRequests(prev => new Set([...prev, userId]));
         } catch (err) {
-            setError('Failed to send friend request');
             console.error('Friend request error:', err);
+            setError('Failed to send friend request');
         }
     };
 
