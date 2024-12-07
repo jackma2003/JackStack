@@ -37,7 +37,7 @@ router.post("/request", authenticateToken, async (req, res) => {
         });
         await friendRequest.save();
 
-        // Add to receiver's friend requests - THIS IS THE IMPORTANT PART
+        // Add to receiver's friend requests
         const updatedUser = await User.findByIdAndUpdate(
             receiverId,
             { $push: { FriendRequests: friendRequest._id } },
@@ -140,5 +140,27 @@ router.get("/friends", authenticateToken, async (req, res) => {
         res.status(500).json({ message: "Error fetching friends list "});
     }
 })
+
+// Remove friend
+router.delete("/:friendId", authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { friendId } = req.params;
+
+        // Remove friend from both users' friend array 
+        await User.findByIdAndUpdate(userId, {
+            $pull: { friends: friendId }
+        });
+        await User.findByIdAndUpdate(friendId, {
+            $pull: { friends: userId }
+        });
+
+        res.json({ message: "Friend removed successfully" });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed to remove friend" });
+    }
+});
 
 export default router;
