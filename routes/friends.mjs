@@ -26,7 +26,7 @@ const authenticateToken = (req, res, next) => {
 router.post("/request", authenticateToken, async (req, res) => {
     try {
         const {receiverId } = req.body;
-        const senderId = req.user._id;
+        const senderId = req.user.userId;
 
         // Check if request already exists 
         const existingRequest = await FriendRequest.findOne({
