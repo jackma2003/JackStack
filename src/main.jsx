@@ -11,6 +11,7 @@ import ProfileSettings from './profileSettings'
 import EditProject from './editProject'
 import FindFriends from './findFriends'
 import FriendRequestNotifications from './friendRequestNotification'
+import Friends from "/.friends"
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -27,6 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/project/:id/edit" element={<EditProject/>}/>
           <Route path="/find-friends" element={<FindFriends />} />
           <Route path="/friend-requests" element={<FriendRequestNotifications />} />
+          <Route path="/friends" element={<Friends/>} />
         </Routes>
       </div>
     </BrowserRouter>
