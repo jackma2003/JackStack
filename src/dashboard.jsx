@@ -150,11 +150,11 @@ const Dashboard = () => {
                                 <UserPlus className="h-5 w-5"/>
                                 <span>Find Friends</span>
                             </button>
-                            <FriendRequestNotifications/>
                             <button Onclick={() => navigate("/friends")} className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                                 <User className="h-5 w-5"/>
                                 <span>My Friends</span>
                             </button>
+                            <FriendRequestNotifications/>
                             <div className="relative">
                                 <button onClick={() => navigate("/profile")} className="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
                                     <User className="h-5 w-5"/>
