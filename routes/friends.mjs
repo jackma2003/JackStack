@@ -130,19 +130,26 @@ router.patch("/request/:requestId", authenticateToken, async (req, res) => {
 // Get friend request 
 router.get("/requests", authenticateToken, async (req, res) => {
     try {
+        console.log('Fetching requests for user:', req.user.userId);
         const user = await User.findById(req.user.userId)
             .populate({
-                path: "FriendRequests",
+                path: "FriendRequests",  // Make sure this matches your schema exactly
                 populate: {
                     path: "sender",
                     select: "username avatar"
                 }
             });
-        res.json(user.FriendRequests);
+        
+        console.log('Found user:', user);
+        console.log('Friend requests:', user.FriendRequests);
+
+        // Only return pending requests
+        const pendingRequests = user.FriendRequests.filter(req => req.status === 'pending');
+        res.json(pendingRequests);
     }
     catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Error fetching friend requests "});
+        console.error('Error in requests route:', err);
+        res.status(500).json({ message: "Error fetching friend requests" });
     }
 });
 

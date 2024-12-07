@@ -8,17 +8,26 @@ const FriendRequestNotifications = () => {
 
     useEffect(() => {
         // Fetch existing requests
+        console.log('Component mounted, fetching requests...');
         fetchRequests();
     }, []);
 
     const fetchRequests = async () => {
         try {
+            console.log('Starting to fetch requests');
             const response = await fetch('/api/friends/requests', {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
             const data = await response.json();
+            console.log('Received requests data:', data);
+
+            if (!Array.isArray(data)) {
+                console.error('Data is not an array:', data);
+                return;
+            }
+            
             setRequests(data);
         } catch (err) {
             console.error('Error fetching requests:', err);
