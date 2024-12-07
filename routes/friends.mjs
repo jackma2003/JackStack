@@ -29,53 +29,28 @@ router.post("/request", authenticateToken, async (req, res) => {
         const {receiverId} = req.body;
         const senderId = req.user.userId;
 
-        // Check if trying to add self
-        if (senderId === receiverId) {
-            return res.status(400).json({ message: "You cannot send a friend request to yourself" });
-        }
-
-        // Check if request already exists 
-        const existingRequest = await FriendRequest.findOne({
-            $or: [
-                { sender: senderId, receiver: receiverId },
-                { sender: receiverId, receiver: senderId}
-            ]
-        });
-
-        if (existingRequest) {
-            if (existingRequest.status === 'pending') {
-                return res.status(400).json({ 
-                    message: existingRequest.sender.toString() === senderId 
-                        ? "You already sent a friend request to this user" 
-                        : "This user has already sent you a friend request" 
-                });
-            } else if (existingRequest.status === 'accepted') {
-                return res.status(400).json({ message: "You are already friends with this user" });
-            }
-        }
-
-        // Check if they're already friends
-        const sender = await User.findById(senderId);
-        if (sender.friends.includes(receiverId)) {
-            return res.status(400).json({ message: "You are already friends with this user" });
-        }
-
         // Create new friend request 
         const friendRequest = new FriendRequest({
             sender: senderId, 
-            receiver: receiverId
+            receiver: receiverId,
+            status: "pending"
         });
         await friendRequest.save();
 
-        // Add to receiver's friend requests
-        await User.findByIdAndUpdate(receiverId, {
-            $push: { FriendRequests: friendRequest._id }
-        });
+        // Add to receiver's friend requests - THIS IS THE IMPORTANT PART
+        const updatedUser = await User.findByIdAndUpdate(
+            receiverId,
+            { $push: { FriendRequests: friendRequest._id } },
+            { new: true }  // Return the updated document
+        );
+
+        console.log('Updated user:', updatedUser); // Add this log
+        console.log('Friend request added:', friendRequest); // Add this log
 
         res.status(201).json({ message: "Friend request sent successfully" });
     }
     catch (err) {
-        console.error(err);
+        console.error('Error in friend request:', err);
         res.status(500).json({ message: "Error sending friend request" });
     }
 });
