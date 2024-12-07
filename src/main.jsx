@@ -11,7 +11,7 @@ import ProfileSettings from './profileSettings'
 import EditProject from './editProject'
 import FindFriends from './findFriends'
 import FriendRequestNotifications from './friendRequestNotification'
-import Friends from "/.friends"
+import Friends from "./friends"
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
