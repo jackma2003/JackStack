@@ -36,7 +36,7 @@ const FriendRequestNotifications = () => {
 
     const handleRequest = async (requestId, status) => {
         try {
-            await fetch(`/api/friends/request/${requestId}`, {
+            const response = await fetch(`/api/friends/request/${requestId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -44,21 +44,27 @@ const FriendRequestNotifications = () => {
                 },
                 body: JSON.stringify({ status })
             });
-
+    
             if (!response.ok) {
                 throw new Error('Failed to process request');
             }
-
-            // Remove request from list
-            setRequests(prev => prev.filter(req => req._id !== requestId));
-
-            // Pull the request from FriendRequest array into user document 
-            await fetch(`/api/friends/request/${requestId}/remove`, {
+    
+            // Wait for the remove request to complete
+            const removeResponse = await fetch(`/api/friends/request/${requestId}/remove`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 }
             });
+    
+            if (!removeResponse.ok) {
+                throw new Error('Failed to remove request');
+            }
+    
+            // Only update UI if both operations succeeded
+            setRequests(prev => prev.filter(req => req._id !== requestId));
+            // close dropdown after action    
+            setShowDropdown(false);
         } 
         catch (err) {
             console.error('Error handling request:', err);
