@@ -45,9 +45,22 @@ const FriendRequestNotifications = () => {
                 body: JSON.stringify({ status })
             });
 
+            if (!response.ok) {
+                throw new Error('Failed to process request');
+            }
+
             // Remove request from list
             setRequests(prev => prev.filter(req => req._id !== requestId));
-        } catch (err) {
+
+            // Pull the request from FriendRequest array into user document 
+            await fetch(`/api/friends/request/${requestId}/remove`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                }
+            });
+        } 
+        catch (err) {
             console.error('Error handling request:', err);
         }
     };

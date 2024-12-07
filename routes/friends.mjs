@@ -60,45 +60,52 @@ router.patch("/request/:requestId", authenticateToken, async (req, res) => {
     try {
         const { requestId } = req.params;
         const { status } = req.body;
-        const userId = req.user._id;
+        const userId = req.user.userId; 
 
         const friendRequest = await FriendRequest.findById(requestId);
-        if (!friendRequest || friendRequest.receiver.toString() !== userId) {
-            return res.status(404).json({ message: "Request not found "});
+        if (!friendRequest) {
+            return res.status(404).json({ message: "Request not found" });
         }
 
         friendRequest.status = status;
         await friendRequest.save();
 
         if (status === "accepted") {
-            // Add each user to the other's friend list 
+            // Add each user to the other's friends list and remove request
             await User.findByIdAndUpdate(friendRequest.sender, {
-                $push: { friends: friendRequest.receiver }
+                $push: { friends: friendRequest.receiver },
+                $pull: { FriendRequests: requestId }
             });
+            
             await User.findByIdAndUpdate(friendRequest.receiver, {
-                $push: { friends: friendRequest.sender }
+                $push: { friends: friendRequest.sender },
+                $pull: { FriendRequests: requestId }
             });
-
-            // Notify sender if online 
-            const senderSocketId = req.app.get("connectedUsers").get(FriendRequest.sender.toString());
-            if (senderSocketId) {
-                req.app.get("io").to(senderSocketId).emit("friendRequestAccepted", {
-                    requestId: friendRequest._id,
-                    friend: await User.findById(friendRequest.receiver).select("username avatar")
-                });
-            }
         }
 
-        // Remove request from receiver's friend request 
-        await User.findByIdAndUpdate(userId, {
-            $pull: { friendRequests: requestId }
-        });
-
-        res.json({ message: `Friend request ${status}`});
+        res.json({ message: `Friend request ${status}` });
     }
     catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Error processing friend request "});
+        res.status(500).json({ message: "Error processing friend request" });
+    }
+});
+
+// Remove friend requests 
+router.post("/request/:requestId/remove", authenticateToken, async (req, res) => {
+    try {
+        const { requestId } = req.params;
+        const userId = req.user.userId;
+
+        await User.findByIdAndUpdate(userId, {
+            $pull: { FriendRequests: requestId }
+        });
+
+        res.json({ message: "Request removed" });
+    } 
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Error removing request" });
     }
 });
 
