@@ -63,7 +63,7 @@ const FriendRequestNotifications = () => {
     
             // Only update UI if both operations succeeded
             setRequests(prev => prev.filter(req => req._id !== requestId));
-            // close dropdown after action    
+            // Close dropdown after action    
             setShowDropdown(false);
         } 
         catch (err) {
