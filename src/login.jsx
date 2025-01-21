@@ -32,7 +32,13 @@ const LoginPage = () => {
         setError("");
 
         try {
-            const response = await fetch("/api/users/login", {
+
+            // Update the fetch URl to use API base URL
+            const API_URL = process.env.NODE_ENV === "production" 
+                ? window.location.origin
+                : "";
+
+            const response = await fetch(`${API_URL}/api/users/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -75,7 +81,11 @@ const LoginPage = () => {
         setResetStatus("");
 
         try {
-            const response = await fetch("/api/users/forgot-password", {
+            const API_URL = process.env.NODE_ENV === 'production' 
+                ? window.location.origin 
+                : '';
+
+            const response = await fetch(`${API_URL}/api/users/forgot-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -31,7 +31,7 @@ app.set('connectedUsers', connectedUsers);
 
 // Configure CORS for production with WebSocket support
 const corsOptions = {
-    origin: process.env.FRONTEND_URL,
+    origin: [process.env.FRONTEND_URL, "https://jack-stack.vercel.app/", /\.vercel\.app$/,],
     credentials: true,
     optionsSuccessStatus: 200,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -86,12 +86,14 @@ const startServer = async () => {
     await connectDB();
     
     const PORT = process.env.PORT || 3000;
+    if (process.env.NODE_ENV === "production") {
     server.listen(PORT, '0.0.0.0', () => {
         console.log(`Server is running on port ${PORT}`);
         console.log(`Frontend URL: ${process.env.FRONTEND_URL}`);
         console.log(`Node environment: ${process.env.NODE_ENV}`);
         console.log('WebSocket server is running');
     });
+    }
 };
 
 startServer().catch(err => {
