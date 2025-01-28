@@ -65,8 +65,6 @@ An Example Task:
 }
 ```
 
-## [Link to Commented First Draft Schema](db.mjs)
-
 ## WireFrames 
 
 /login - User authentication page 
@@ -97,32 +95,31 @@ An Example Task:
 10. As a project owner, I can manage project settings and member access 
 
 ## Research Topics 
-* (6 points) React with Hooks and React-dnd 
+* React with Hooks and React-dnd 
     * Using React as the frontend framework 
     * Drag and Drop feature for projects/task's with react-dnd 
     * Real-time updates and component lifecycle management using Hooks 
     * Building reusable components for task management 
     * Will require deployment considerations for frontend/backend separation 
 
-* (3 points) Socket.io Integration 
+* Socket.io Integration 
     * Implementing real-time updates for task changes
     * Enabling live collaboration features 
 
-* (2 points) Tailwind CSS Framework 
+* Tailwind CSS Framework 
     * Using Tailwind for customized UI components 
     * Creating a custom theme to match project branding 
     * Implementing responsive design patterns 
     * Will show custom configuration in tailwind.config.js 
 
-* (2 points) ESLint with Vite 
+* ESLint with Vite 
     * Implement ESLint for code quality and consistency 
     * Custom ESLint configuration for React/Node.js 
     * Integration with Vite build process 
     * Will demonstrate automatic linting on file changes 
 
-13 points total out of 10 required points 
 
-### Libraries/Packages to Use
+### Libraries/Packages 
 * React (Frontend Framework)
 * Socket.io (Real-time Communication)
 * Tailwind CSS (Styling)
@@ -130,4 +127,3 @@ An Example Task:
 * ESLint (Code Quality)
 * Vite (Build Tool)
 
-## [Link to Initial Main Project File](app.mjs)
