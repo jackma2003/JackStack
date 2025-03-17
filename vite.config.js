@@ -23,7 +23,7 @@ export default defineConfig({
     include: ['socket.io-client'],
   },
   server: {
-    port: 3000, // Frontend port
+    port: 29366, // Frontend port
     proxy: {
       '/api': {
         target: 'http://linserv1.cims.nyu.edu:29366', // Backend port
