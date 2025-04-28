@@ -1,129 +1,90 @@
-# JackStack - Project Management Tool
+# JackStack 🧰 Collaborative Project Management
 
-## Overview
+## 🚀 Our Vision
+JackStack is a powerful, web-based project management platform built to transform how teams collaborate and manage work. With an intuitive Kanban interface and real-time updates, JackStack bridges the gap between project planning and execution.
 
-Managing projects and team collaboration effectively can be challenging without proper tools and organization. That's where JackStack comes in!
+## 💻 Technology Stack
 
-JackStack is a web-based project management application built on the MERN stack that helps teams collaborate efficiently. Users can create projects, manage tasks using a Kanban board interface, track progress, and communicate in real-time. The application provides features like drag-and-drop task management, real-time updates, task assignments, and project analytics.
+### Frontend
+- **React.js**: Creating interactive, responsive user interfaces
+- **Tailwind CSS**: Utility-first styling for modern design
+- **React Router**: Seamless client-side navigation
+- **React DnD**: Intuitive drag-and-drop functionality
+- **Socket.io Client**: Real-time communication
+- **Lucide React**: Beautiful, consistent icons
 
-## Data Model
+### Backend
+- **Node.js/Express**: Fast, minimalist web framework
+- **MongoDB/Mongoose**: Flexible document database with elegant ODM
+- **Socket.io**: Bidirectional event-based communication
+- **JWT Authentication**: Secure user sessions
+- **Bcrypt.js**: Industry-standard password hashing
+- **Nodemailer**: Email service integration
 
-The application will store Users, Projects, Tasks, and Comments
+## ✨ Key Features
 
-* Users can have multiple projects (via references)
-* Projects can have multiple tasks (via references)
-* Tasks can have multiple comments (by embedding)
-* Tasks can be assigned to users (via references)
+### 👤 User Management
+- **Secure Authentication**: Register, login, and reset passwords securely
+- **Profile Management**: Update personal information and preferences
+- **Remember Me**: Convenient persistent sessions
+- **Password Recovery**: Secure email-based reset process
 
-### Example Documents:
+### 📋 Project Management
+- **Project Dashboard**: Visual overview of all your projects
+- **Create & Customize**: Build projects with custom details and descriptions
+- **Status Tracking**: Mark projects as active or archived
+- **Owner Controls**: Manage project settings and access
+- **Future Feature**: Team member invitations (coming soon)
 
-An Example User:
-```javascript
-{
-  username: "johndoe",
-  email: "john@example.com",
-  hash: // password hash,
-  avatar: "url_to_avatar",
-  projects: // array of references to Project documents
-  createdAt: // timestamp
-}
-```
-An Example Project:
-```javascript
-{
-  name: "Website Redesign",
-  description: "Redesign company website with new branding",
-  owner: // reference to User object
-  members: // array of references to User objects,
-  status: "active",
-  createdAt: // timestamp,
-  updatedAt: // timestamp
-}
-```
-An Example Task:
-```javascript 
-{
-  project: // reference to Project object
-  title: "Design Homepage Mockup",
-  description: "Create initial mockup for homepage design",
-  status: "in-progress", // ["todo", "in-progress", "review", "done"]
-  priority: "high", // ["low", "medium", "high"]
-  assignee: // reference to User object
-  creator: // reference to User object
-  dueDate: // date
-  position: 1, // position in the column
-  labels: ["design", "frontend"],
-  comments: [
-    {
-      user: // reference to User object,
-      content: "First draft completed, need feedback",
-      createdAt: // timestamp
-    }
-  ],
-  createdAt: // timestamp,
-  updatedAt: // timestamp
-}
-```
+### 📊 Kanban Task Board
+- **Interactive Interface**: Visual task management with drag-and-drop
+- **Custom Columns**: Track tasks through todo, in-progress, review, and done stages
+- **Task Prioritization**: Set low, medium, or high priority levels
+- **Due Dates**: Schedule and monitor task deadlines
+- **Task Labels**: Categorize with custom tags for better organization
+- **Task Comments**: Facilitate discussions within tasks
+- **Assignment**: Delegate tasks to specific team members
 
-## WireFrames 
+### 👥 Social Features
+- **Friend System**: Connect with colleagues and collaborators
+- **Friend Search**: Find users by username or email
+- **Friend Requests**: Send, accept, or reject connection requests
+- **Friend Management**: View and manage your network
+- **Real-time Notifications**: Instant alerts for friend requests
 
-/login - User authentication page 
-![Login Page](documentation/login.png)
+### ⚡ Real-time Updates
+- **Live Collaboration**: See changes as they happen
+- **Instant Notifications**: Stay informed about important activities
+- **Synchronized Boards**: Keep everyone on the same page
+- **Real-time Comments**: Communicate with team members instantly
 
-/dashboard - Main dashboard showing all projects 
-![Dashboard](documentation/dashboard.png)
+## 🏢 System Architecture
 
-/project/:id - Project board with Kanban view
-![Project Board](documentation/project.png) 
+The application follows a modern MERN stack architecture with real-time capabilities:
 
-/project/:id/settings - Project settings page
-![Project Setting](documentation/project:setting.png)
+### Data Models
+- **User**: Authentication, profile, and social connections
+- **Project**: Workspaces owned by users with team members
+- **Task**: Work items with status, priority, and assignments
+- **Friend Request**: Connection requests between users
 
-## Site Map 
-![Site Map](documentation/site_map.png)
+### Components
+- **Authentication System**: JWT-based secure login and registration
+- **Project Dashboard**: Visual management of multiple projects
+- **Kanban Board**: Interactive task management interface
+- **Friend System**: Social networking functionality
+- **Real-time Engine**: Socket.io integration for live updates
 
-## User Stories or Use Cases 
-1. As a new user, I can register for an account with my email and password 
-2. As a registered user, I can log in to access my projects
-3. As an user, I can create new projects and invite team members to contribute to these projects 
-4. As an user, I can create tasks within a project 
-5. As an user, I can assign tasks to team members 
-6. As an user, I can drag and drop tasks between different status columns 
-7. As an user, I can comment on tasks 
-8. As an user, I can receive real-time updates when tasks are modified 
-9. As an user, I can set due dates and priorities for tasks 
-10. As a project owner, I can manage project settings and member access 
+## 🖥️ User Interfaces
 
-## Research Topics 
-* React with Hooks and React-dnd 
-    * Using React as the frontend framework 
-    * Drag and Drop feature for projects/task's with react-dnd 
-    * Real-time updates and component lifecycle management using Hooks 
-    * Building reusable components for task management 
-    * Will require deployment considerations for frontend/backend separation 
+### For Team Members
+- **Dashboard**: View all your projects at a glance
+- **Kanban Board**: Drag and drop tasks between status columns
+- **Task Details**: Create, edit, and comment on tasks
+- **Friend Management**: Find and connect with teammates
 
-* Socket.io Integration 
-    * Implementing real-time updates for task changes
-    * Enabling live collaboration features 
-
-* Tailwind CSS Framework 
-    * Using Tailwind for customized UI components 
-    * Creating a custom theme to match project branding 
-    * Implementing responsive design patterns 
-    * Will show custom configuration in tailwind.config.js 
-
-* ESLint with Vite 
-    * Implement ESLint for code quality and consistency 
-    * Custom ESLint configuration for React/Node.js 
-    * Integration with Vite build process 
-    * Will demonstrate automatic linting on file changes 
-
-
-### Libraries/Packages 
-* React (Frontend Framework)
-* Socket.io (Real-time Communication)
-* Tailwind CSS (Styling)
-* react-dnd (Drag and Drop)
-* ESLint (Code Quality)
-* Vite (Build Tool)
-
+### For Project Owners
+- **Project Creation**: Set up new projects with custom details
+- **Project Settings**: Configure project status and permissions
+- **Activity Overview**: Monitor project progress
+- **Note**: Team member collaboration feature is planned for future updates
